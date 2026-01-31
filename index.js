@@ -1,17 +1,32 @@
- const express = require('express');
-const cors = require('cors');
-const userRouter = require('./routers/user.router'); // เช็ค path ไฟล์ให้ถูก
+// ไฟล์: index.js
+require("dotenv").config(); // ✅ ต้องอยู่บรรทัดแรกสุดเท่านั้น
+const express = require("express");
+const mongoose = require("mongoose");
+const cors = require("cors");
+const UserRouter = require("./routers/user.router");
+const ServiceRouter = require("./routers/service.router");
+const BookingRouter = require("./routers/booking.router");
 
 const app = express();
-
-app.use(cors());
-app.use(express.json()); // สำคัญมาก!
-
-// Register route
-app.use('/api/users', userRouter);
-
-// ลองเพิ่ม route ทดสอบตรงนี้
-app.get('/test', (req, res) => res.send("API is working!"));
-
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+// ✅ แก้ให้ตรงกับ .env ของคุณ (MONGODB_URI)
+const DB_URL = process.env.MONGODB_URI; 
+
+app.use(cors({ origin: true, credentials: true }));
+app.use(express.json());
+
+// Routes
+app.use("/api/users", UserRouter);
+app.use("/api/services", ServiceRouter);
+app.use("/api/bookings", BookingRouter);
+
+// Database Connection
+if (!DB_URL) {
+    console.error("❌ Error: MONGODB_URI is not defined in .env file");
+} else {
+    mongoose.connect(DB_URL)
+        .then(() => console.log("✅ MongoDB Connected"))
+        .catch((err) => console.error("❌ MongoDB Connection Error:", err.message));
+}
+
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));

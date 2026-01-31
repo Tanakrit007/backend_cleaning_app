@@ -3,7 +3,11 @@ const mongoose = require('mongoose');
 const userSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
-    role: { type: String, default: 'user' } // แยก 'user' และ 'admin'
+    role: {
+    type: String,
+    enum: ['user', 'admin'],
+    default: 'admin' 
+} // แยก 'user' และ 'admin'
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);

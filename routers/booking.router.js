@@ -1,12 +1,11 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const bookingController = require('../Controller/booking.controller');
+const bookingController = require("../controllers/booking.controller");
+const authJwt = require("../middlewares/authJWT.middleware");
 
-router.post('/', bookingController.createBooking);
-router.get('/:user', bookingController.getUserBookings);
-
-// Admin / management endpoints
-router.get('/', bookingController.getAllBookings);
-router.put('/:id/status', bookingController.updateBookingStatus);
+// ต้อง Login ก่อนถึงจะจองหรือดูประวัติได้
+router.post("/", authJwt.verifyToken, bookingController.createBooking);
+router.get("/", authJwt.verifyToken, bookingController.getAllBookings); // สำหรับ Admin
+router.get("/:userId", authJwt.verifyToken, bookingController.getUserBookings); // สำหรับ User ดูประวัติตัวเอง
 
 module.exports = router;

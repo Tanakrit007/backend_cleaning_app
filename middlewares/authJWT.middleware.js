@@ -1,14 +1,27 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const secret = process.env.JWT_SECRET;
 
 const verifyToken = (req, res, next) => {
-    const token = req.headers['x-access-token'];
-    if (!token) return res.status(403).send({ message: "No token provided!" });
+    // รองรับทั้ง x-access-token และ Authorization header
+    const token = req.headers["x-access-token"] || req.headers["authorization"]?.split(" ")[1];
 
-    jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
-        if (err) return res.status(401).send({ message: "Unauthorized!" });
-        req.userId = decoded.id;
-        next();
+    if (!token) {
+         return res.status(401).send({ message: "Token is missing!" });
+    }
+
+    jwt.verify(token, secret, (err, decoded) => {
+      if (err) {
+        return res.status(403).send({ message: "Access Forbidden" });
+      }
+
+      // ✅ แก้ตรงนี้: เปลี่ยนจาก req.authorId เป็น req.userId
+      req.userId = decoded.id; 
+      req.username = decoded.username;
+      req.role = decoded.role;
+      next();
     });
 };
 
-module.exports = { verifyToken };
+const authJwt = { verifyToken };
+module.exports = authJwt;
