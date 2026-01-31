@@ -3,9 +3,14 @@ const router = express.Router();
 const bookingController = require("../controllers/booking.controller");
 const authJwt = require("../middlewares/authJWT.middleware");
 
-// ต้อง Login ก่อนถึงจะจองหรือดูประวัติได้
+// ✅ 1. สร้างการจอง (ใช้ Token ระบุตัวตน)
 router.post("/", authJwt.verifyToken, bookingController.createBooking);
-router.get("/", authJwt.verifyToken, bookingController.getAllBookings); // สำหรับ Admin
-router.get("/:userId", authJwt.verifyToken, bookingController.getUserBookings); // สำหรับ User ดูประวัติตัวเอง
+
+// ✅ 2. ดูประวัติของตัวเอง (เปลี่ยนจาก /:userId เป็น /my-bookings)
+// วิธีนี้ปลอดภัยกว่า เพราะระบบจะดึง ID จาก Token โดยตรง ไม่ต้องส่ง ID มาทาง URL
+router.get("/my-bookings", authJwt.verifyToken, bookingController.getUserBookings);
+
+// ✅ 3. สำหรับ Admin ดูทั้งหมด
+router.get("/", authJwt.verifyToken, bookingController.getAllBookings);
 
 module.exports = router;

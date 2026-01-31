@@ -1,18 +1,24 @@
-// ไฟล์: index.js
-require("dotenv").config(); // ✅ ต้องอยู่บรรทัดแรกสุดเท่านั้น
+// index.js
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
 const UserRouter = require("./routers/user.router");
 const ServiceRouter = require("./routers/service.router");
 const BookingRouter = require("./routers/booking.router");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-// ✅ แก้ให้ตรงกับ .env ของคุณ (MONGODB_URI)
-const DB_URL = process.env.MONGODB_URI; 
+const DB_URL = process.env.MONGODB_URI;
 
-app.use(cors({ origin: true, credentials: true }));
+// ✅ แก้ไข CORS ตรงนี้: ต้องอนุญาต x-access-token ด้วย
+app.use(cors({ 
+    origin: true, 
+    credentials: true,
+    allowedHeaders: ["Content-Type", "x-access-token", "Authorization"] 
+}));
+
 app.use(express.json());
 
 // Routes

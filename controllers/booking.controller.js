@@ -25,12 +25,22 @@ exports.createBooking = async (req, res) => {
 
 exports.getUserBookings = async (req, res) => {
   try {
-    // ดึงเฉพาะรายการที่ userId ตรงกับคนที่ login หรือตามพารามิเตอร์ที่ส่งมา
-    const userId = req.params.userId; 
-    const bookings = await Booking.find({ userId }).populate('service').sort({ createdAt: -1 });
+    // ✅ แก้ไข: ดึง userId จาก req.userId ที่ได้จาก middleware verifyToken
+    const userId = req.userId; 
+
+    if (!userId) {
+      return res.status(401).json({ message: "ไม่พบข้อมูลผู้ใช้ กรุณาเข้าสู่ระบบใหม่" });
+    }
+
+    // ค้นหาการจองที่ตรงกับ User และดึงข้อมูล Service มาแสดงผล (Populate)
+    const bookings = await Booking.find({ userId })
+      .populate('service') 
+      .sort({ createdAt: -1 }); // เรียงจากล่าสุดขึ้นก่อน
+
     res.json(bookings);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("Error in getUserBookings:", err);
+    res.status(500).json({ message: "เกิดข้อผิดพลาดในการดึงข้อมูล: " + err.message });
   }
 };
 
