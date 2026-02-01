@@ -13,4 +13,7 @@ router.get("/my-bookings", authJwt.verifyToken, bookingController.getUserBooking
 // ✅ 3. สำหรับ Admin ดูทั้งหมด
 router.get("/", authJwt.verifyToken, bookingController.getAllBookings);
 
+// เพิ่มบรรทัดนี้ในไฟล์ routers/booking.router.js
+router.put("/:id/status", authJwt.verifyToken, bookingController.updateBookingStatus);
+
 module.exports = router;

@@ -44,6 +44,28 @@ exports.getUserBookings = async (req, res) => {
   }
 };
 
+// เพิ่มฟังก์ชันนี้ในไฟล์ controllers/booking.controller.js
+exports.updateBookingStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body; // รับค่า status ใหม่ เช่น 'completed'
+
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      id,
+      { status: status },
+      { new: true } // คืนค่าข้อมูลที่อัปเดตแล้วกลับมา
+    ).populate('service');
+
+    if (!updatedBooking) {
+      return res.status(404).json({ message: "ไม่พบข้อมูลการจอง" });
+    }
+
+    res.json(updatedBooking);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.getAllBookings = async (req, res) => {
   try {
     // สำหรับ Admin ดึงทั้งหมด
